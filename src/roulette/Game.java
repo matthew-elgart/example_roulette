@@ -12,12 +12,13 @@ public class Game {
     // name of the game
     private static final String DEFAULT_NAME = "Roulette";
     // bets player can make
-    private Bet[] myPossibleBets = { 
-        new Bet("Red or Black", 1),
-        new Bet("Odd or Even", 1),
-        new Bet("Three in a Row", 11)
-    };
     private Wheel myWheel;
+    private Bet[] myPossibleBets = { 
+        new BetColor("Red or Black", 1, myWheel),
+        new BetEvenOdd("Odd or Even", 1, myWheel),
+        new BetNumber("Three in a Row", 11, myWheel)
+    };
+    
 
     /**
      * Construct the game.
@@ -44,7 +45,7 @@ public class Game {
     public void play (Gambler player) {
         int amount = ConsoleReader.promptRange("How much do you want to bet",
                                                0, player.getBankroll());
-        int whichBet = promptForBet();
+        Bet whichBet = promptForBet();
         String betChoice = placeBet(whichBet);
 
         System.out.print("Spinning ...");
@@ -52,7 +53,7 @@ public class Game {
         System.out.println(String.format("Dropped into %s %d", myWheel.getColor(), myWheel.getNumber()));
         if (betIsMade(whichBet, betChoice)) {
             System.out.println("*** Congratulations :) You win ***");
-            amount *= myPossibleBets[whichBet].getOdds();
+            amount *= whichBet.getOdds();
         }
         else {
             System.out.println("*** Sorry :( You lose ***");
@@ -64,12 +65,12 @@ public class Game {
     /**
      * Prompt the user to make a bet from a menu of choices.
      */
-    private int promptForBet () {
+    private Bet promptForBet () {
         System.out.println("You can make one of the following types of bets:");
         for (int k = 0; k < myPossibleBets.length; k++) {
             System.out.println(String.format("%d) %s", (k + 1), myPossibleBets[k].getDescription()));
         }
-        return ConsoleReader.promptRange("Please make a choice", 1, myPossibleBets.length) - 1;
+        return myPossibleBets[ConsoleReader.promptRange("Please make a choice", 1, myPossibleBets.length) - 1];
     }
 
     /**
@@ -77,8 +78,8 @@ public class Game {
      *
      * @param whichBet specific bet chosen by the user
      */
-    private String placeBet (int whichBet) {
-        String result = "";
+    private String placeBet (Bet whichBet) {
+        /*String result = "";
         if (whichBet == 0) {
             result = ConsoleReader.promptOneOf("Please bet", Wheel.BLACK, Wheel.RED);
         }
@@ -90,7 +91,8 @@ public class Game {
                                                     1, Wheel.NUM_SPOTS - 3);
         }
         System.out.println();
-        return result;
+        return result;*/
+    	return whichBet.placeBet();
     }
 
     /**
@@ -99,8 +101,8 @@ public class Game {
      * @param whichBet specific bet chosen by the user
      * @param betChoice specific value user chose to try to win the bet
      */
-    private boolean betIsMade (int whichBet, String betChoice) {
-        if (whichBet == 0) {
+    private boolean betIsMade (Bet whichBet, String betChoice) {
+        /*if (whichBet == 0) {
             return myWheel.getColor().equals(betChoice);
         }
         else if (whichBet == 1) {
@@ -113,6 +115,7 @@ public class Game {
         }
         else {
             return false;
-        }
+        }*/
+    	return whichBet.betIsMade(betChoice);
     }
 }
